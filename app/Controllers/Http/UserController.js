@@ -36,7 +36,7 @@ class UserController {
 		}, getValidationMessages())
 
 		if(validation.fails()) {
-			return response.status(403).json(validation.messages()[0])
+			return response.status(403).json(validation.messages())
 		}
 
 		const newUser = new User()
