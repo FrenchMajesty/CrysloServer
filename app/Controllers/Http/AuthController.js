@@ -1,6 +1,6 @@
 'use strict'
 
-const VerificationCode = use ('App/Moddels/VerificationCode')
+const VerificationCode = use ('App/Models/VerificationCode')
 const { validate } = use('Validator')
 
 class AuthController {
@@ -24,8 +24,8 @@ class AuthController {
 	 * @param  {Object} options.response The HTTP response object
 	 * @return {Object}                  
 	 */
-	validateEmail({request, response}) {
-		const validator = validate(request.all(), {
+	async validateEmail({request, response}) {
+		const validator = await validate(request.all(), {
 			email: 'required|email|unique:users',
 		}, getValidationMessages())
 
@@ -42,8 +42,8 @@ class AuthController {
 	 * @param  {Object} options.response The HTTP response object
 	 * @return {Object}                  
 	 */
-	validateNumber({request, response}) {
-		const validator = validate(request.all(), {
+	async validateNumber({request, response}) {
+		const validator = await validate(request.all(), {
 			number: 'required|unique:users',
 		}, getValidationMessages())
 
@@ -60,8 +60,8 @@ class AuthController {
 	 * @param  {Object} options.response The HTTP response object
 	 * @return {Object}                  
 	 */
-	verifyNumber({request, response}) {
-		const validator = validate(request.all(), {
+	async verifyNumber({request, response}) {
+		const validator = await validate(request.all(), {
 			number: 'required|unique:users',
 			code: 'required',
 		}, getValidationMessages())
