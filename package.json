@@ -24,7 +24,9 @@
     "@adonisjs/framework": "^5.0.5",
     "@adonisjs/ignitor": "^2.0.6",
     "@adonisjs/lucid": "^5.0.3",
-    "mysql": "^2.15.0"
+    "@adonisjs/validator": "^5.0.3",
+    "mysql": "^2.15.0",
+    "nodemon": "^1.17.4"
   },
   "devDependencies": {},
   "autoload": {
