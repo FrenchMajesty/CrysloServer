@@ -16,7 +16,15 @@
 const Route = use('Route')
 
 Route.get('/', ({ request }) => {
-  return { greeting: 'Hello sir. If you are reading this, then this is the start of something new. The foundation of the server for Cryslo...' }
+  return { greeting: 'Look.If you are reading this, then this is the start of something new. The foundation of the server for Cryslo...' }
 })
+
+Route.post('/login', 'AuthController.login').as('login')
+
+Route.group(() => {
+
+	Route.get('/user', 'UserController.user').as('user')
+
+}).middleware(['auth']).formats(['json'])
 
 Route.resource('users', 'UserController').apiOnly().formats(['json'])
