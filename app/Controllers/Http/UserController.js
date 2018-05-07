@@ -5,6 +5,11 @@ const { validate } = use('Validator')
 
 class UserController {
 
+	/**
+	 * Return the request user's User model
+	 * @param  {Object} options.auth The Auth module
+	 * @return {Object}              
+	 */
 	user({auth}) {
 		return auth.getUser()
 	}
