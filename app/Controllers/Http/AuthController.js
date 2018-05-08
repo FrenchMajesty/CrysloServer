@@ -51,6 +51,12 @@ class AuthController {
 			return response.status(422).json(validator.messages())
 		}
 
+		// Create a verificaton code
+		const code = new VerificationCode()
+		code.number = request.input('number')
+		code.generateCode()
+		code.save()
+
 		return response.status(200).json(true)
 	}
 
@@ -69,27 +75,19 @@ class AuthController {
 		if(validator.fails()) {
 			return response.status(422).json(validator.messages())
 		}
-
-		const code = await VerificationCode.query()
-			.where({
-				code: request.input('code'),
-				number: request.input('number'),
-			})
+		const {code, number} = request.all()
+		const codeEntry = await VerificationCode.query()
+			.where({code, number})
   			.orderBy('id', 'desc')
   			.fetch()[0]
 
-  		if(!code) {
+  		if(!codeEntry) {
   			return response.status(404).json({message: 'The verification code provided is invalid.'})
   		}
 
-  		await VerificationCode.query()
-			.where({
-				code: request.input('code'),
-				number: request.input('number'),
-			})
-  			.delete()
+		VerificationCode.query().where({code, number}).delete()
 
-  		return resonse.status(200).json(true)
+  		return response.status(200).json(true)
 	}
 }
 
@@ -100,6 +98,7 @@ function getValidationMessages() {
 		'number.unique': 'This phone number is already used.',
 		'email.unique': 'This email is already used.',
 		'email.email': 'The email is not valid.',
+		'code.required': 'The verification code is required.',
 	}
 }
 
