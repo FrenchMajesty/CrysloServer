@@ -39,13 +39,8 @@ class UserController {
 			return response.status(403).json(validation.messages())
 		}
 
-		const newUser = new User()
-		newUser.email = request.input('email')
-		newUser.password = request.input('password')
-		newUser.number = request.input('number')
-		await newUser.save()
-
-		return newUser
+		const {email, password, number} = request.all()
+		return await new User.create({email, passord, number})
 	}
 
 	/**
