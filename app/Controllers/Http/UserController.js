@@ -10,8 +10,9 @@ class UserController {
 	 * @param  {Object} options.auth The Auth module
 	 * @return {Object}              
 	 */
-	user({auth}) {
-		return auth.getUser()
+	async user({auth}) {
+		const {id} = await auth.getUser()
+		return User.query().where({id}).with('rank').first()
 	}
 
 	/**
