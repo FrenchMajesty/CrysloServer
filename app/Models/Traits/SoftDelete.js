@@ -15,6 +15,24 @@ class SoftDelete {
 			this.deleted_at = Database.fn.now()
 			this.save()
 		}
+
+		/**
+		 * Find the rows that have not been discarded yet
+		 * @param  {Database} query The query builder
+		 * @return {Database}       
+		 */
+		Model.scopeNotDeleted = function(query) {
+			return query.whereNull('deleted_at')
+		}
+
+		/**
+		 * Find only the rows that have been discarded 
+		 * @param  {Database} query The query builder
+		 * @return {Database}       
+		 */
+		Model.scopeDiscardedOnly = function(query) {
+			return query.whereNotNull('deleted_at')
+		}
 	}
 }
 

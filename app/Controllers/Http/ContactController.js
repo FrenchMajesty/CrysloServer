@@ -10,7 +10,7 @@ class ContactController {
 	 * @return {Array} 
 	 */
 	async index () {
-		return Contact.all()
+		return Contact.query().notDeleted().fetch()
 	}
 
 	/**

@@ -20,7 +20,7 @@ class UserController {
 	 * @return {Array} 
 	 */
 	index() {
-		return User.all()
+		return User.query().notDeleted().fetch()
 	}
 
 	/**
