@@ -13,6 +13,7 @@ class UserSchema extends Schema {
             table.string('number').notNullable().unique()
             table.boolean('number_verified').defaultTo(false)
             table.timestamps(true, true)
+            table.timestamp('deleted_at').nullable()
         })
     }
 
