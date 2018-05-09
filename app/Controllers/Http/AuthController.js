@@ -11,7 +11,7 @@ class AuthController {
 	 * Handle a request to login by a user
 	 * @param  {Object} options.request The HTTP request object
 	 * @param  {Object} options.auth    The Auth module
-	 * @return {String}                 
+	 * @return {Token}                 
 	 */
 	async login({request, auth}) {
 		const { email, password } = request.all()
