@@ -1,5 +1,6 @@
 'use strict'
 
+const AuthActivity = use('App/Models/AuthActivity')
 const User = use('App/Models/User')
 const { validate } = use('Validator')
 
@@ -36,15 +37,22 @@ class UserController {
 		const validation = await validate(request.all(), {
 			email: 'required|email|unique:users',
 			password: 'required',
-			number: 'required|max:15',
+			number: 'required|max:15|unique:users',
 		}, getValidationMessages())
 
 		if(validation.fails()) {
 			return response.status(422).json(validation.messages())
 		}
 
-		const {email, password, number} = request.all()
-		return User.create({email, passord, number})
+		const userData = request.only(['email','password','number'])
+		const user = await User.create(userData)
+		
+		AuthActivity.create({
+			user_id: user.id,
+			action: 'SIGNUP'
+		})
+
+		return user
 	}
 
 	/**
