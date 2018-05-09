@@ -34,6 +34,14 @@ class User extends Model {
     }
 
     /**
+     * Get all the of the WeCare contacts this user has
+     * @return {Array} 
+     */
+    contacts() {
+        return this.belongsToMany('App/Models/WeCareContact').pivotTable('user_contacts')
+    }
+
+    /**
      * A relationship on tokens is required for auth to
      * work. Since features like `refreshTokens` or
      * `rememberToken` will be saved inside the
