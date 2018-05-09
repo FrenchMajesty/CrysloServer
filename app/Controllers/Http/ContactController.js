@@ -40,7 +40,7 @@ class ContactController {
 		}
 
 		const {name, number} = request.all()
-		const {id: user_id} = auth.getUser()
+		const {id: user_id} = await auth.getUser()
 
 		return Contact.create({name, number, user_id})
 	}
@@ -49,12 +49,13 @@ class ContactController {
 	 * Handle the request to update a user's WeCare contact 
 	 * @param  {Object} options.request  The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
-	 * @param  {Object} options.auth     The Auth module
-	 * @return {WeCareContact}                  
+	 * @param  {Number} options.params.id The contact's ID
+	 * @return {Void}                  
 	 */
-	async update ({request, response, auth}) {
+	async update ({request, response, params:{id}}) {
+		await Contact.findOrFail(id) // Verify entry exist before continuing
+
 		const validation = await validate(request.all(), {
-			id: 'required|exists:we_care_contacts',
 			name: 'required',
 			number: 'required|max:10',
 		}, getValidationMessages())
@@ -63,11 +64,10 @@ class ContactController {
 			return response.status(422).json(validation.messages())
 		}
 
-		const {id, name, number} = request.all()
-		const contact = await new Contact.find(id)
+		const {name, number} = request.all()
+		const contact = await Contact.find(id)
 		contact.merge({name, number})
-
-		return contact.save()
+		contact.save()
 	}
 
 	/**
@@ -76,17 +76,11 @@ class ContactController {
 	 * @param  {Object} options.response The HTTP response object
 	 * @return {Void}                  
 	 */
-	async destroy({request, response}) {
-		const validation = await validate(request.all(), {
-			id: 'required|exists:we_care_contacts',
-		}, getValidationMessages())
+	async destroy({request, response, params:{id}}) {
+		await Contact.findOrFail(id) // Verify entry exist before continuing
 
-		if(validation.fails()) {
-			return response.status(422).json(validation.messages())
-		}
-
-		const contact = await new Contact.find(request.input('id'))
-		contact.delete()
+		const contact = await Contact.find(id)
+		contact.discard()
 	}
 }
 
@@ -94,6 +88,7 @@ function getValidationMessages() {
 	return {
 		'name.required': 'The contact\'s name is required.',
 		'number.required': 'The contact\'s phone number is required.',
+		'id.required': 'Missing ID: Please select a contact to modify.',
 		'number.max': 'The phone number entered is too long.',
 		'id.exists': 'This contact no longer exists in our database.',
 	}
