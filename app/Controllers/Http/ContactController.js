@@ -5,10 +5,21 @@ const { validate } = use('Validator')
 
 class ContactController {
 
+	/**
+	 * Show all the WeCare contact entries
+	 * @return {Array} 
+	 */
 	async index () {
+		return Contact.all()
 	}
 
-	async store () {
+	/**
+	 * Return a WeCare contact entry
+	 * @param  {Number} options.params.id The contact's ID
+	 * @return {WeCareContact}                 
+	 */
+	async show({params: {id}}) {
+		return Contact.findOrFail(id)
 	}
 
   	/**
@@ -25,7 +36,7 @@ class ContactController {
 		}, getValidationMessages())
 
 		if(validation.fails()) {
-			return response.status(403).json(validation.messages())
+			return response.status(422).json(validation.messages())
 		}
 
 		const {name, number} = request.all()
@@ -34,10 +45,29 @@ class ContactController {
 		return new Contact.create({name, number, user_id})
 	}
 
-	async edit () {
-	}
+	/**
+	 * Handle the request to update a user's WeCare contact 
+	 * @param  {Object} options.request  The HTTP request object
+	 * @param  {Object} options.response The HTTP response object
+	 * @param  {Object} options.auth     The Auth module
+	 * @return {WeCareContact}                  
+	 */
+	async update ({request, response, auth}) {
+		const validation = await validate(request.all(), {
+			id: 'required|exists:we_care_contacts',
+			name: 'required',
+			number: 'required|max:10',
+		}, getValidationMessages())
 
-	async update () {
+		if(validation.fails()) {
+			return response.status(422).json(validation.messages())
+		}
+
+		const {id, name, number} = request.all()
+		const contact = await new Contact.find(id)
+		contact.merge({name, number})
+
+		return contact.save()
 	}
 
 	/**
@@ -52,7 +82,7 @@ class ContactController {
 		}, getValidationMessages())
 
 		if(validation.fails()) {
-			return response.status(403).json(validation.messages())
+			return response.status(422).json(validation.messages())
 		}
 
 		const contact = await new Contact.find(request.input('id'))
