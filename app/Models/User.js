@@ -38,7 +38,7 @@ class User extends Model {
      * @return {Array} 
      */
     contacts() {
-        return this.belongsToMany('App/Models/WeCareContact').pivotTable('user_contacts')
+        return this.hasMany('App/Models/WeCareContact')
     }
 
     /**

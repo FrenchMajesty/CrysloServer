@@ -9,11 +9,11 @@ class WeCareContact extends Model {
   	}
 
   	/**
-  	 * Get all the users who have this contact as one of their WeCare emergencies
+  	 * Get the user who has this contact as one of their WeCare emergencies
   	 * @return {Array} 
   	 */
   	users() {
-  		return this.belongsToMany('App/Models/User').pivotTable('user_contacts')
+  		return this.belongsTo('App/Models/User')
   	}
 }
 
