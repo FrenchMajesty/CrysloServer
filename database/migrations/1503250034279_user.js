@@ -10,6 +10,7 @@ class UserSchema extends Schema {
             table.string('lastname').nullable()
             table.string('email').notNullable().unique()
             table.string('password').notNullable()
+            table.integer('rank_id').defaultTo(0)
             table.string('number').notNullable().unique()
             table.boolean('number_verified').defaultTo(false)
             table.timestamps(true, true)
