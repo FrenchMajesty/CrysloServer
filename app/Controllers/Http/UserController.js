@@ -11,12 +11,24 @@ class UserController {
 	 * @param  {Object} options.auth The Auth module
 	 * @return {User}              
 	 */
-	async user({auth}) {
+	async user({request, auth}) {
 		const {id} = await auth.getUser()
-		return User.query().where({id})
-			.with('rank')
-			.with('contacts', (query) => query.notDeleted())
-			.first()
+		const {withRank, withContact, withAuthHistory} = request.get()
+		const query = User.query().where({id})
+
+		if(withRank) {
+			query.with('rank')
+		}
+
+		if(withContact) {
+			query.with('contacts', (query) => query.notDeleted())
+		}
+
+		if(withAuthHistory) {
+			query.with('authHistory')	
+		}
+
+		return query.first()
 	}
 
 	/**
