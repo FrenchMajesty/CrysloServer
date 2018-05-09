@@ -6,9 +6,9 @@ const { validate } = use('Validator')
 class UserController {
 
 	/**
-	 * Return the request user's User model
+	 * Return the logged in user's User model
 	 * @param  {Object} options.auth The Auth module
-	 * @return {Object}              
+	 * @return {User}              
 	 */
 	async user({auth}) {
 		const {id} = await auth.getUser()
@@ -27,7 +27,7 @@ class UserController {
 	 * Handle a request to register a new user
 	 * @param  {Object} options.request The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
-	 * @return {Object}                 
+	 * @return {User}                 
 	 */
 	async store({request, response}) {
 		const validation = await validate(request.all(), {
@@ -47,7 +47,7 @@ class UserController {
 	/**
 	 * Return an user's entry or throw 404 if not found
 	 * @param  {Number} options.params.id The user's ID
-	 * @return {Object}                 
+	 * @return {User}                 
 	 */
 	show({response, params: {id}}) {
 		return User.findOrFail(id)
