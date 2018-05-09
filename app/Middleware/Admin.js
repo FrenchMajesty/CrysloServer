@@ -8,7 +8,7 @@ class Admin {
 		const rank = await Rank.find(rId)
 
 		if(rank.level < 4) {
-			return response.status(403).json({message: 'You are not authorized to view this page.'})
+			return response.status(403).json({message: 'You are not authorized to perform this action.'})
 		}
 
 		await next()
