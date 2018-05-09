@@ -68,6 +68,14 @@ class User extends Model {
     }
 
     /**
+     * Get all the heart measurements for this user
+     * @return {Array} 
+     */
+    heartData() {
+        return this.hasMany('App/Models/HeartUserData')
+    }
+
+    /**
      * A relationship on tokens is required for auth to
      * work. Since features like `refreshTokens` or
      * `rememberToken` will be saved inside the
