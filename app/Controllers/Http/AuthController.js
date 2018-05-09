@@ -53,7 +53,10 @@ class AuthController {
 
 		// Create a verificaton code
 		const code = new VerificationCode()
-		code.number = request.input('number')
+		code.fill({
+			number: request.input('number'),
+			purpose: 'signup',
+		})
 		code.generateCode()
 		code.save()
 
@@ -68,25 +71,28 @@ class AuthController {
 	 */
 	async verifyNumber({request, response}) {
 		const validator = await validate(request.all(), {
-			number: 'required|unique:users',
+			number: 'required',
 			code: 'required',
 		}, getValidationMessages())
 
 		if(validator.fails()) {
 			return response.status(422).json(validator.messages())
 		}
+
+		// Fetch latest matching verification code
 		const {code, number} = request.all()
 		const codeEntry = await VerificationCode.query()
 			.where({code, number})
+			.whereNull('deleted_at')
   			.orderBy('id', 'desc')
-  			.fetch()[0]
+  			.first()
 
   		if(!codeEntry) {
-  			return response.status(404).json({message: 'The verification code provided is invalid.'})
+			return response.status(422)
+					.json([{message: 'The verification code provided is invalid.'}])
   		}
 
-		VerificationCode.query().where({code, number}).delete()
-
+  		codeEntry.discard()
   		return response.status(200).json(true)
 	}
 }
