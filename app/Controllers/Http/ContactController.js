@@ -4,10 +4,8 @@ const Contact = use('App/Models/WeCareContact')
 const { validate } = use('Validator')
 
 class ContactController {
-	async index () {
-	}
 
-	async create () {
+	async index () {
 	}
 
 	async store () {
@@ -33,7 +31,7 @@ class ContactController {
 		const {name, number} = request.all()
 		const {id: user_id} = auth.getUser()
 
-		return await new Contact.create({name, number, user_id})
+		return new Contact.create({name, number, user_id})
 	}
 
 	async edit () {
@@ -58,7 +56,7 @@ class ContactController {
 		}
 
 		const contact = await new Contact.find(request.input('id'))
-		await contact.delete()
+		contact.delete()
 	}
 }
 
