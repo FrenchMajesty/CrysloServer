@@ -36,7 +36,7 @@ class UserController {
 		}, getValidationMessages())
 
 		if(validation.fails()) {
-			return response.status(403).json(validation.messages())
+			return response.status(422).json(validation.messages())
 		}
 
 		const {email, password, number} = request.all()
@@ -49,8 +49,7 @@ class UserController {
 	 * @return {Object}                 
 	 */
 	show({response, params: {id}}) {
-		const user = User.findOrFail(id)
-		return user
+		return User.findOrFail(id)
 	}
 
 	update() {
