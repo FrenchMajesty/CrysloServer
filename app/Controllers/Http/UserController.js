@@ -8,6 +8,7 @@ class UserController {
 
 	/**
 	 * Return the logged in user's User model
+	 * @param {Object} options.request The HTTP Request object
 	 * @param  {Object} options.auth The Auth module
 	 * @return {User}              
 	 */
@@ -25,7 +26,7 @@ class UserController {
 		}
 
 		if(withAuthHistory) {
-			query.with('authHistory')	
+			query.with('authHistory')
 		}
 
 		return query.first()
