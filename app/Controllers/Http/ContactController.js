@@ -42,7 +42,7 @@ class ContactController {
 		const {name, number} = request.all()
 		const {id: user_id} = auth.getUser()
 
-		return new Contact.create({name, number, user_id})
+		return Contact.create({name, number, user_id})
 	}
 
 	/**

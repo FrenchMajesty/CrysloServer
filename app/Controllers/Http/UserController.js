@@ -41,7 +41,7 @@ class UserController {
 		}
 
 		const {email, password, number} = request.all()
-		return new User.create({email, passord, number})
+		return User.create({email, passord, number})
 	}
 
 	/**
