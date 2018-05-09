@@ -1,6 +1,8 @@
 'use strict'
 
 const VerificationCode = use ('App/Models/VerificationCode')
+const AuthActivity = use ('App/Models/AuthActivity')
+const User = use ('App/Models/User')
 const { validate } = use('Validator')
 
 class AuthController {
@@ -14,8 +16,22 @@ class AuthController {
 	async login({request, auth}) {
 		const { email, password } = request.all()
 
-		// return the JWT
-	    return await auth.attempt(email, password)
+		const user = await User.query().select('id').where({email}).first()
+		let attempt = null
+
+		if(user) {
+			attempt = await AuthActivity.create({
+				user_id: user.id,
+				action: 'ATTEMPT_LOGIN',
+			})
+		}
+
+	    const token = await auth.attempt(email, password)
+
+	    // if successful
+	    attempt.action = 'LOGIN'
+	    attempt.save()
+	    return token
 	}
 
 	/**
