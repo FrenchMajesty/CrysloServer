@@ -33,6 +33,10 @@ Route.group(() => {
 
 Route.group(() => {
 
+}).prefix('/wecare').formats(['json'])
+
+Route.group(() => {
+
 	Route.get('/user', 'UserController.user').as('user')
 
 }).middleware(['auth']).formats(['json'])
