@@ -13,9 +13,9 @@ class UserController {
 	async user({auth}) {
 		const {id} = await auth.getUser()
 		return User.query().where({id})
-		.with('rank')
-		.with('contacts', (query) => query.notDeleted())
-		.first()
+			.with('rank')
+			.with('contacts', (query) => query.notDeleted())
+			.first()
 	}
 
 	/**
