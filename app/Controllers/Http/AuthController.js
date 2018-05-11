@@ -99,7 +99,7 @@ class AuthController {
 		const {code, number} = request.all()
 		const codeEntry = await VerificationCode.query()
 			.where({code, number})
-			.whereNull('deleted_at')
+			.notDeleted()
   			.orderBy('id', 'desc')
   			.first()
 
