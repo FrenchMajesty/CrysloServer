@@ -8,7 +8,7 @@ class AuthActivitySchema extends Schema {
 			table.increments()
 			table.integer('user_id').notNullable()
 			table.string('action').notNullable()
-			table.timestamps()
+			table.timestamps(true, true)
 		})
 	}
 

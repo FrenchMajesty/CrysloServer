@@ -8,7 +8,7 @@ class RankSchema extends Schema {
 			table.increments()
 			table.integer('level').notNullable()
 			table.string('title').notNullable()
-			table.timestamps()
+			table.timestamps(true, true)
 		})
 	}
 
