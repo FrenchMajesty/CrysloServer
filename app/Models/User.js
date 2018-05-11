@@ -3,91 +3,91 @@
 const Model = use('Model')
 
 class User extends Model {
-    static boot () {
-        super.boot()
+	static boot () {
+		super.boot()
 
-        /**
-         * A hook to hash the user password before saving
-         * it to the database.
-         *
-         * Look at `app/Models/Hooks/User.js` file to
-         * check the hashPassword method
-         */
-        this.addHook('beforeCreate', 'User.hashPassword')
-        this.addTrait('SoftDelete')
-    }
+		/**
+		 * A hook to hash the user password before saving
+		 * it to the database.
+		 *
+		 * Look at `app/Models/Hooks/User.js` file to
+		 * check the hashPassword method
+		 */
+		this.addHook('beforeCreate', 'User.hashPassword')
+		this.addTrait('SoftDelete')
+	}
 
-    /**
-     * The fields that should not be included with a JSON response
-     * @return {Array} 
-     */
-    static get hidden() {
-        return ['password']
-    }
+	/**
+	 * The fields that should not be included with a JSON response
+	 * @return {Array} 
+	 */
+	static get hidden() {
+		return ['password']
+	}
 
-    /**
-     * Add columns to be casted and treated as dates
-     * @return {Array} 
-     */
-    static get dates() {
-        return super.dates.concat(['deleted_at'])
-    }
+	/**
+	 * Add columns to be casted and treated as dates
+	 * @return {Array} 
+	 */
+	static get dates() {
+		return super.dates.concat(['deleted_at'])
+	}
 
-     /**
-     * Format the date to be returned by the API
-     * @param  {String} field Name of the field
-     * @param  {Object} value moment.js instance of the date
-     * @return {String}       
-     */
-    static castDates(field, value) {
-        return `${value.fromNow(true)} ago`
-    }
+	 /**
+	 * Format the date to be returned by the API
+	 * @param  {String} field Name of the field
+	 * @param  {Object} value moment.js instance of the date
+	 * @return {String}       
+	 */
+	static castDates(field, value) {
+		return `${value.fromNow(true)} ago`
+	}
 
-    /**
-     * Get the rank associated with this user
-     * @return {Rank} 
-     */
-    rank() {
-        return this.belongsTo('App/Models/Rank')
-    }
+	/**
+	 * Get the rank associated with this user
+	 * @return {Rank} 
+	 */
+	rank() {
+		return this.belongsTo('App/Models/Rank')
+	}
 
-    /**
-     * Get all the of the WeCare contacts this user has
-     * @return {Array} 
-     */
-    contacts() {
-        return this.hasMany('App/Models/WeCareContact')
-    }
+	/**
+	 * Get all the of the WeCare contacts this user has
+	 * @return {Array} 
+	 */
+	contacts() {
+		return this.hasMany('App/Models/WeCareContact')
+	}
 
-    /**
-     * Get the auth activity of this user
-     * @return {Array} 
-     */
-    authHistory() {
-        return this.hasMany('App/Models/AuthActivity')
-    }
+	/**
+	 * Get the auth activity of this user
+	 * @return {Array} 
+	 */
+	authHistory() {
+		return this.hasMany('App/Models/AuthActivity')
+	}
 
-    /**
-     * Get all the heart measurements for this user
-     * @return {Array} 
-     */
-    heartData() {
-        return this.hasMany('App/Models/Reading/HeartUserData')
-    }
+	/**
+	 * Get all the heart measurements for this user
+	 * @return {Array} 
+	 */
+	heartData() {
+		return this.hasMany('App/Models/Reading/HeartUserData')
+	}
 
-    /**
-     * A relationship on tokens is required for auth to
-     * work. Since features like `refreshTokens` or
-     * `rememberToken` will be saved inside the
-     * tokens table.
-     *
-     * @method tokens
-     *
-     * @return {Object}
-     */
-    tokens () {
-        return this.hasMany('App/Models/Token')
-    }
+	/**
+	 * A relationship on tokens is required for auth to
+	 * work. Since features like `refreshTokens` or
+	 * `rememberToken` will be saved inside the
+	 * tokens table.
+	 *
+	 * @method tokens
+	 *
+	 * @return {Object}
+	 */
+	tokens () {
+		return this.hasMany('App/Models/Token')
+	}
 }
 
 module.exports = User
