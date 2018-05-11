@@ -20,10 +20,7 @@ class AuthController {
 		let attempt = null
 
 		if(user) {
-			attempt = await AuthActivity.create({
-				user_id: user.id,
-				action: 'ATTEMPT_LOGIN',
-			})
+			attempt = await AuthActivity.create({user_id: user.id, action: 'ATTEMPT_LOGIN'})
 		}
 
 	    const token = await auth.attempt(email, password)
@@ -99,10 +96,7 @@ class AuthController {
 		// Create a verificaton code
 		const {number} = request.all()
 		const code = new VerificationCode()
-		code.fill({
-			number,
-			purpose: 'forgotpwd',
-		})
+		code.fill({number, purpose: 'forgotpwd'})
 		code.generateCode()
 		code.save()
 
@@ -144,8 +138,16 @@ class AuthController {
 	}
 
 
+	/**
+	 * Handle the request for a user to reset their password to a new one after forgetting
+	 * their previous password
+	 * @param  {Object} options.request  The HTTP request object
+	 * @param  {Object} options.response The HTTP response object
+	 * @return {Void}                  
+	 */
 	async resetPassword({request, response}) {
 		const validator = await validate(request.all(), {
+			id: 'required|exists:users',
 			password: 'required',
 		}, getValidationMessages())
 
@@ -153,7 +155,12 @@ class AuthController {
 			return response.status(422).json(validator.messages())
 		}
 
-		const await user
+		const user = await User.find(id)
+		user.password = request.input('password')
+		user.save()
+
+		// Record this action
+		await AuthActivity.create({user_id: user.id, action: 'RESET_PASSWORD'})
 	}
 }
 
