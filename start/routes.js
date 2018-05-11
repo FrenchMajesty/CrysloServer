@@ -25,7 +25,11 @@ Route.group(() => {
 
 	Route.post('/email', 'AuthController.validateEmail').as('validate.email')
 
-	Route.post('/number/:purpose', 'AuthController.validateNumber').as('validate.number')
+	Route.post('/number/signup', 'AuthController.validateNumberSignUp')
+		.as('validate.number.signup')
+
+	Route.post('/number/forgotpwd', 'AuthController.validateNumberForgotPassword')
+		.as('validate.number.forgotpwd')
 
 	Route.post('/verify', 'AuthController.verifyNumber').as('verify.number')
 

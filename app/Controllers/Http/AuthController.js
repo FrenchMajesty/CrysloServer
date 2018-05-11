@@ -53,16 +53,15 @@ class AuthController {
 	}
 
 	/**
-	 * Handle a request to verify whether a phone number is good for use or not
+	 * Handle a request to verify whether a phone number is not in use for creating 
+	 * a new account
 	 * @param  {Object} options.request  The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
-	 * @param {String} options.params.purpose The reason for validating the number
 	 * @return {Object}                  
 	 */
-	async validateNumber({request, response, params: {purpose}}) {
+	async validateNumberSignUp({request, response}) {
 		const validator = await validate(request.all(), {
-			purpose: 'required|in:signup,forgotpwd',
-			number: purpose == 'signup' ? 'required|unique:users' : 'required',
+			number: 'required|unique:users',
 		}, getValidationMessages())
 
 		if(validator.fails()) {
@@ -73,12 +72,42 @@ class AuthController {
 		const code = new VerificationCode()
 		code.fill({
 			number: request.input('number'),
-			purpose,
+			purpose: 'signup',
 		})
 		code.generateCode()
 		code.save()
 
 		return response.status(200).json(true)
+	}
+
+	/**
+	 * Handle a request to verify whether an account with the given phone number 
+	 * exists for resetting a forgotten password 
+	 * @param  {Object} options.request  The HTTP request object
+	 * @param  {Object} options.response The HTTP response object
+	 * @return {Object}                  
+	 */
+	async validateNumberForgotPwd({request, response}) {
+		const validator = await validate(request.all(), {
+			number: 'required',
+		}, getValidationMessages())
+
+		if(validator.fails()) {
+			return response.status(422).json(validator.messages())
+		}
+
+		// Create a verificaton code
+		const {number} = request.all()
+		const code = new VerificationCode()
+		code.fill({
+			number,
+			purpose: 'forgotpwd',
+		})
+		code.generateCode()
+		code.save()
+
+		const {id} = await User.query().where({number}).first()
+		return response.status(200).json({id})
 	}
 
 	/**
@@ -112,6 +141,19 @@ class AuthController {
 
   		codeEntry.discard()
   		return response.status(200).json(true)
+	}
+
+
+	async resetPassword({request, response}) {
+		const validator = await validate(request.all(), {
+			password: 'required',
+		}, getValidationMessages())
+
+		if(validator.fails()) {
+			return response.status(422).json(validator.messages())
+		}
+
+		const await user
 	}
 }
 
