@@ -29,8 +29,8 @@ class ContactController {
 	 * @param  {Object} options.auth     The Auth module
 	 * @return {WeCareContact}                  
 	 */
-	async store({request, response, auth}) {
-		const validation = await validate(request.all(), {
+	async store({request, response, auth, params:{id}}) {
+		const validation = await validate(, {
 			name: 'required',
 			number: 'required|max:10',
 		}, getValidationMessages())
@@ -53,11 +53,10 @@ class ContactController {
 	 * @return {Void}                  
 	 */
 	async update ({request, response, params:{id}}) {
-		await Contact.findOrFail(id) // Verify entry exist before continuing
-
-		const validation = await validate(request.all(), {
+		const validation = await validate({...request.all(), id}, {
 			name: 'required',
 			number: 'required|max:10',
+			id: 'required|exists:we_care_contacts',
 		}, getValidationMessages())
 
 		if(validation.fails()) {
@@ -77,9 +76,7 @@ class ContactController {
 	 * @return {Void}                  
 	 */
 	async destroy({request, response, params:{id}}) {
-		await Contact.findOrFail(id) // Verify entry exist before continuing
-
-		const contact = await Contact.find(id)
+		const contact = await Contact.findOrFail(id)
 		contact.discard()
 	}
 }
@@ -90,7 +87,7 @@ function getValidationMessages() {
 		'number.required': 'The contact\'s phone number is required.',
 		'id.required': 'Missing ID: Please select a contact to modify.',
 		'number.max': 'The phone number entered is too long.',
-		'id.exists': 'This contact no longer exists in our database.',
+		'id.exists': 'This contact does not or no longer exists in our database.',
 	}
 }
 
