@@ -14,7 +14,7 @@ class UserController {
 	 */
 	async user({request, auth}) {
 		const {id} = await auth.getUser()
-		const {withRank, withContact, withAuthHistory} = request.get()
+		const {withRank, withContact, withAuthHistory, withHeartData} = request.get()
 		const query = User.query().where({id})
 
 		if(withRank) {
@@ -27,6 +27,10 @@ class UserController {
 
 		if(withAuthHistory) {
 			query.with('authHistory')
+		}
+
+		if(withHeartData) {
+			query.with('heartData')
 		}
 
 		return query.first()
