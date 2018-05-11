@@ -56,11 +56,13 @@ class AuthController {
 	 * Handle a request to verify whether a phone number is good for use or not
 	 * @param  {Object} options.request  The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
+	 * @param {String} options.params.purpose The reason for validating the number
 	 * @return {Object}                  
 	 */
-	async validateNumber({request, response}) {
+	async validateNumber({request, response, params: {purpose}}) {
 		const validator = await validate(request.all(), {
-			number: 'required|unique:users',
+			purpose: 'required|in:signup,forgotpwd',
+			number: purpose == 'signup' ? 'required|unique:users' : 'required',
 		}, getValidationMessages())
 
 		if(validator.fails()) {
@@ -71,7 +73,7 @@ class AuthController {
 		const code = new VerificationCode()
 		code.fill({
 			number: request.input('number'),
-			purpose: 'signup',
+			purpose,
 		})
 		code.generateCode()
 		code.save()
