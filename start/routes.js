@@ -33,12 +33,19 @@ Route.group(() => {
 
 Route.group(() => {
 
-}).prefix('/wecare').formats(['json'])
-
-Route.group(() => {
-
 	Route.get('/user', 'UserController.user').as('user')
 
 }).middleware(['auth']).formats(['json'])
 
-Route.resource('users', 'UserController').apiOnly().formats(['json'])
+
+Route.resource('wecare', 'ContactController')
+	.apiOnly()
+	.middleware(['auth'])
+	.middleware(new Map([ [['wecare.index'],['admin']] ]))
+	.formats(['json'])
+
+Route.resource('users', 'UserController')
+	.apiOnly()
+	.middleware(new Map([ [['users.update','users'],['auth']] ]))
+	.middleware(new Map([ [['users.index'],['admin']] ]))
+	.formats(['json'])
