@@ -72,7 +72,7 @@ class User extends Model {
      * @return {Array} 
      */
     heartData() {
-        return this.hasMany('App/Models/HeartUserData')
+        return this.hasMany('App/Models/Reading/HeartUserData')
     }
 
     /**
