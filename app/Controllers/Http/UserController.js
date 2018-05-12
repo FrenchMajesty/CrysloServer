@@ -14,22 +14,29 @@ class UserController {
 	 */
 	async user({request, auth}) {
 		const {id} = await auth.getUser()
-		const {withRank, withContact, withAuthHistory, withHeartData} = request.get()
 		const query = User.query().where({id})
 
-		if(withRank) {
+		if(request.input('withRank',false)) {
 			query.with('rank')
 		}
 
-		if(withContact) {
+		if(request.input('withContact',false)) {
 			query.with('contacts', (query) => query.notDeleted())
 		}
 
-		if(withAuthHistory) {
+		if(request.input('withReferred',false)) {
+			query.with('referred')
+		}
+
+		if(request.input('withReferree',false)) {
+			query.with('referree')
+		}
+
+		if(request.input('withAuthHistory',false)) {
 			query.with('authHistory')
 		}
 
-		if(withHeartData) {
+		if(request.input('withHeartData',false)) {
 			query.with('heartData')
 		}
 
