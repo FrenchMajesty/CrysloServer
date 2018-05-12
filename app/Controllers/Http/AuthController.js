@@ -148,7 +148,7 @@ class AuthController {
 	async resetPassword({request, response}) {
 		const validator = await validate(request.all(), {
 			id: 'required|exists:users',
-			password: 'required',
+			password: 'required|min:6|confirmed',
 		}, getValidationMessages())
 
 		if(validator.fails()) {
@@ -160,7 +160,7 @@ class AuthController {
 		user.save()
 
 		// Record this action
-		await AuthActivity.create({user_id: user.id, action: 'RESET_PASSWORD'})
+		AuthActivity.create({user_id: user.id, action: 'RESET_PASSWORD'})
 	}
 }
 
@@ -172,6 +172,8 @@ function getValidationMessages() {
 		'email.unique': 'This email is already used.',
 		'email.email': 'The email is not valid.',
 		'code.required': 'The verification code is required.',
+		'password.min': 'The password needs to be at least 6 characters.',
+		'password.confirmed': 'The passwords do not match.',
 	}
 }
 
