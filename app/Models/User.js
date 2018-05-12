@@ -3,7 +3,7 @@
 const Model = use('Model')
 
 class User extends Model {
-	
+
 	static boot () {
 		super.boot()
 
@@ -52,6 +52,22 @@ class User extends Model {
 	 */
 	contacts() {
 		return this.hasMany('App/Models/WeCareContact')
+	}
+
+	/**
+	 * Get all the users that were referred by this one
+	 * @return {Array} 
+	 */
+	referred() {
+		return this.manyThrough('App/Models/Referral','newUser')
+	}
+
+	/**
+	 * Get the user that referred this one
+	 * @return {Array} 
+	 */
+	referree() {
+		return this.belongsToMany('App/Models/User','new_user_id','user_id').pivotTable('referrals')
 	}
 
 	/**
