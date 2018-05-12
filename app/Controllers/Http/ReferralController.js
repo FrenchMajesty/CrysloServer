@@ -1,26 +1,58 @@
 'use strict'
 
+const User = use('App/Models/User')
+const Referral = use('App/Models/Referral')
+const { validate } = use('Validator')
+
 class ReferralController {
-  async index () {
-  }
+	async index () {
+	}
 
-  async create () {
-  }
+	/**
+	 * Handle a request to apply a referral code for a new user signing up
+	 * @param  {Object} options.request The request HTTP object
+	 * @param  {Object} options.auth    The Auth module
+	 * @return {Void}                 
+	 */
+	async create ({request, auth}) {
+		const validator = await validate(request.all(), {
+			referral_id: 'required|exists:users',
+		}, getValidationMessages())
 
-  async store () {
-  }
+		if(validator.fails()) {
+			return response.status(422).json(validator.messages())
+		}
 
-  async show () {
-  }
+		const referralId = request.only(['referral_id'])
+		const {id: user_id} = await User.query().select('id').where(referralId).first()
+		const {id: new_user_id} = auth.getUser()
 
-  async edit () {
-  }
+		Referral.create({user_id, new_user_id})
 
-  async update () {
-  }
+		// Apply referral credit to user_id's account here
+	}
 
-  async destroy () {
-  }
+	async store () {
+	}
+
+	async show () {
+	}
+
+	async edit () {
+	}
+
+	async update () {
+	}
+
+	async destroy () {
+	}
+}
+
+function getValidationMessages() {
+	return {
+		'referral_id.required': 'The referral code is required.',
+		'referral_id.exists': 'The referral code entered does not exist.',
+	}
 }
 
 module.exports = ReferralController
