@@ -41,6 +41,9 @@ Route.group(() => {
 
 }).middleware(['auth']).formats(['json'])
 
+Route.resource('ref', 'ReferralController')
+	.apiOnly()
+	.formats(['json'])
 
 Route.resource('wecare', 'ContactController')
 	.apiOnly()
