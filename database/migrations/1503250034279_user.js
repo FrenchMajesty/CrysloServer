@@ -13,6 +13,7 @@ class UserSchema extends Schema {
             table.integer('rank_id').defaultTo(0)
             table.string('number').notNullable().unique()
             table.boolean('number_verified').defaultTo(false)
+            table.string('referral_id').notNullable().unique()
             table.timestamps(true, true)
             table.timestamp('deleted_at').nullable()
         })
