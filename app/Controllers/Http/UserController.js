@@ -1,6 +1,7 @@
 'use strict'
 
 const AuthActivity = use('App/Models/AuthActivity')
+const Guardian = use('App/Models/Guardian')
 const User = use('App/Models/User')
 const { validate } = use('Validator')
 
@@ -84,6 +85,12 @@ class UserController {
 			user_id: user.id,
 			action: 'SIGNUP'
 		})
+
+		// Generate default Guardian settings
+		const guardianSettings = new Guardian()
+		guardianSettings.generateDefault()
+		guardianSettings.user_id = user.id
+		guardianSettings.save()
 
 		return user
 	}
