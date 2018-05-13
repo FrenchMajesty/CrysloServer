@@ -6,11 +6,13 @@ const { validate } = use('Validator')
 class ContactController {
 
 	/**
-	 * Show all the WeCare contact entries
+	 * Show all the WeCare contact entries for the logged in user
+	 * @param {Object} options.auth The Auth module
 	 * @return {Array} 
 	 */
-	async index () {
-		return Contact.query().notDeleted().fetch()
+	async index ({auth}) {
+		const {id: user_id} = await auth.getUser()
+		return Contact.query().notDeleted().where({user_id}).fetch()
 	}
 
 	/**

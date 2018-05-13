@@ -48,7 +48,7 @@ Route.resource('ref', 'ReferralController')
 Route.resource('wecare', 'ContactController')
 	.apiOnly()
 	.middleware(['auth'])
-	.middleware(new Map([ [['wecare.index'],['admin']] ]))
+	.middleware(new Map([ [['wecare.all'],['admin']] ]))
 	.formats(['json'])
 
 Route.resource('users', 'UserController')
