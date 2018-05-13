@@ -3,6 +3,7 @@
 const VerificationCode = use ('App/Models/VerificationCode')
 const AuthActivity = use ('App/Models/AuthActivity')
 const User = use ('App/Models/User')
+const Hash = use('Hash')
 const { validate } = use('Validator')
 
 class AuthController {
@@ -86,7 +87,7 @@ class AuthController {
 	 */
 	async validateNumberForgotPwd({request, response}) {
 		const validator = await validate(request.all(), {
-			number: 'required',
+			number: 'required|exists:users',
 		}, getValidationMessages())
 
 		if(validator.fails()) {
@@ -154,9 +155,9 @@ class AuthController {
 		if(validator.fails()) {
 			return response.status(422).json(validator.messages())
 		}
-
+		const {password, id} = request.all()
 		const user = await User.find(id)
-		user.password = request.input('password')
+		user.password = await Hash.make(password)
 		user.save()
 
 		// Record this action
@@ -169,6 +170,7 @@ function getValidationMessages() {
 		'email.required': 'The email is required.',
 		'number.required': 'The phone number is required.',
 		'number.unique': 'This phone number is already used.',
+		'number.exists': 'No account with this phone number was found.',
 		'email.unique': 'This email is already used.',
 		'email.email': 'The email is not valid.',
 		'code.required': 'The verification code is required.',
