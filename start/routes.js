@@ -45,6 +45,11 @@ Route.resource('ref', 'ReferralController')
 	.apiOnly()
 	.formats(['json'])
 
+Route.resource('guardian', 'GuardianController')
+	.apiOnly()
+	.middleware(['auth'])
+	.formats(['json'])
+
 Route.resource('wecare', 'ContactController')
 	.apiOnly()
 	.middleware(['auth'])
