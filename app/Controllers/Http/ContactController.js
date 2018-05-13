@@ -73,11 +73,10 @@ class ContactController {
 
 	/**
 	 * Handle the request to delete a WeCare contact
-	 * @param  {Object} options.request  The HTTP request object
-	 * @param  {Object} options.response The HTTP response object
+	 * @param {Number} options.params.id The ID of the contact to delete 
 	 * @return {Void}                  
 	 */
-	async destroy({request, response, params:{id}}) {
+	async destroy({params:{id}}) {
 		const contact = await Contact.findOrFail(id)
 		contact.discard()
 	}
