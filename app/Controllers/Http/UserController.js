@@ -93,8 +93,38 @@ class UserController {
 		return User.findOrFail(id)
 	}
 
-	update() {
+	/**
+	 * Handle a request to update an user's profile
+	 * @param  {Object} options.request The HTTP request object
+	 * @param  {Object} options.response The HTTP response object
+	 * @param {Object} options.auth The Auth module
+	 * @return {Void}                 
+	 */
+	async update({request, response, auth}) {
+		const validation = await validate(request.all(), {
+			email: 'required|email',
+			firstname: 'required|max:50',
+			lastname: 'required|max:50',
+		}, getValidationMessages())
 
+		if(validation.fails()) {
+			return response.status(422).json(validation.messages())
+		}
+
+		const {id} = await auth.getUser()
+		const user = await User.find(id)
+
+		// Verify that the email isn't in use by another user
+		const {email} = request.all()
+		const search = await User.query().whereNot({id}).where({email}).first()
+
+		if(search) {
+			return response.status(422).json([{message: 'This email address is already used.'}])
+		}
+
+		const userData = request.only(['email','firstname','lastname'])
+		user.merge(userData)
+		user.save()
 	}
 
 	destroy() {
@@ -104,13 +134,10 @@ class UserController {
 
 function getValidationMessages() {
 	return {
-		'email.required': 'The email is required.',
-		'password.required': 'The password is required.',
-		'number.required': 'The phone number is required.',
-		'number.unique': 'This phone number is already used.',
+		'required': 'The {{ field }} is required.',
+		'unique': 'This {{ field }} is already used.',
+		'max': 'The {{ field }} is too long.',
 		'email.email': 'The email is not valid.',
-		'email.unique': 'This email is already used.',
-		'number.max': 'The phone number is too long.',
 	}
 }
 
