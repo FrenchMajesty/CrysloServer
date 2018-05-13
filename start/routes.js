@@ -21,6 +21,8 @@ Route.get('/', ({ request }) => {
 
 Route.post('/login', 'AuthController.login').as('login')
 
+Route.post('/resetpwd', 'AuthController.resetPassword').as('reset.pwd')
+
 Route.group(() => {
 
 	Route.post('/email', 'AuthController.validateEmail').as('validate.email')
@@ -28,7 +30,7 @@ Route.group(() => {
 	Route.post('/number/signup', 'AuthController.validateNumberSignUp')
 		.as('validate.number.signup')
 
-	Route.post('/number/forgotpwd', 'AuthController.validateNumberForgotPassword')
+	Route.post('/number/forgotpwd', 'AuthController.validateNumberForgotPwd')
 		.as('validate.number.forgotpwd')
 
 	Route.post('/verify', 'AuthController.verifyNumber').as('verify.number')
