@@ -14,7 +14,7 @@ class ReferralController {
 	 * @param  {Object} options.auth    The Auth module
 	 * @return {Void}                 
 	 */
-	async create ({request, auth}) {
+	async store ({request, auth}) {
 		const validator = await validate(request.all(), {
 			referral_id: 'required|exists:users',
 		}, getValidationMessages())
@@ -31,16 +31,9 @@ class ReferralController {
 
 		// Apply referral credit to user_id's account here
 	}
-
-	async store () {
-	}
-
 	async show () {
 	}
-
-	async edit () {
-	}
-
+	
 	async update () {
 	}
 
