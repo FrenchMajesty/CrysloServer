@@ -119,7 +119,12 @@ class UserController {
 		const search = await User.query().whereNot({id}).where({email}).first()
 
 		if(search) {
-			return response.status(422).json([{message: 'This email address is already used.'}])
+			const message = {
+				message: 'This email address is already used.',
+				field: 'email',
+			};
+
+			return response.status(422).json([message])
 		}
 
 		const userData = request.only(['email','firstname','lastname'])
@@ -135,7 +140,11 @@ class UserController {
 function getValidationMessages() {
 	return {
 		'required': 'The {{ field }} is required.',
+		'firstname.required': 'The first name is required.',
+		'lastname.required': 'The last name is required.',
 		'unique': 'This {{ field }} is already used.',
+		'lastname.max': 'The last name is too long.',
+		'firstname.max': 'The first name is too long.',
 		'max': 'The {{ field }} is too long.',
 		'email.email': 'The email is not valid.',
 	}
