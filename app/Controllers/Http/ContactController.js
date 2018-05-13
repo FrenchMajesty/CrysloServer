@@ -10,7 +10,7 @@ class ContactController {
 	 * @param {Object} options.auth The Auth module
 	 * @return {Array} 
 	 */
-	async index ({auth}) {
+	async index({auth}) {
 		const {id: user_id} = await auth.getUser()
 		return Contact.query().notDeleted().where({user_id}).fetch()
 	}
@@ -54,7 +54,7 @@ class ContactController {
 	 * @param  {Number} options.params.id The contact's ID
 	 * @return {Void}                  
 	 */
-	async update ({request, response, params:{id}}) {
+	async update({request, response, params:{id}}) {
 		const validation = await validate({...request.all(), id}, {
 			name: 'required',
 			number: 'required|max:10',
