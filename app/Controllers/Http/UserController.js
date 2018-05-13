@@ -55,9 +55,10 @@ class UserController {
 	 * Handle a request to register a new user
 	 * @param  {Object} options.request The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
+	 * @param {Object} options.auth The Auth module
 	 * @return {User}                 
 	 */
-	async store({request, response}) {
+	async store({request, response, auth}) {
 		const validation = await validate(request.all(), {
 			email: 'required|email|unique:users',
 			password: 'required',
@@ -70,7 +71,11 @@ class UserController {
 
 		const userData = request.only(['email','password','number'])
 		const user = await User.create(userData)
-		
+
+		// Generate JWT Token
+		const {token} = await auth.generate(user)
+		user.token = token
+
 		AuthActivity.create({
 			user_id: user.id,
 			action: 'SIGNUP'
