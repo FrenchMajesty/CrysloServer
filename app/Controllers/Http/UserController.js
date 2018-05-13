@@ -24,6 +24,10 @@ class UserController {
 			query.with('contacts', (query) => query.notDeleted())
 		}
 
+		if(request.input('withGuardians',false)) {
+			query.with('guardians')
+		}
+
 		if(request.input('withReferred',false)) {
 			query.with('referred')
 		}
