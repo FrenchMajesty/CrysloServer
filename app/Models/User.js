@@ -55,6 +55,14 @@ class User extends Model {
 	}
 
 	/**
+	 * Get the Guardians settings of this user
+	 * @return {Guardian} 
+	 */
+	guardians() {
+		return this.hasOne('App/Models/Guardian')
+	}
+
+	/**
 	 * Get all the users that were referred by this one
 	 * @return {Array} 
 	 */
