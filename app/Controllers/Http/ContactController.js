@@ -29,8 +29,8 @@ class ContactController {
 	 * @param  {Object} options.auth     The Auth module
 	 * @return {WeCareContact}                  
 	 */
-	async store({request, response, auth, params:{id}}) {
-		const validation = await validate(, {
+	async store({request, response, auth}) {
+		const validation = await validate(request.all(), {
 			name: 'required',
 			number: 'required|max:10',
 		}, getValidationMessages())
@@ -63,9 +63,9 @@ class ContactController {
 			return response.status(422).json(validation.messages())
 		}
 
-		const {name, number} = request.all()
+		const contactData = request.only(['name','number'])
 		const contact = await Contact.find(id)
-		contact.merge({name, number})
+		contact.merge(contactData)
 		contact.save()
 	}
 
@@ -85,7 +85,7 @@ function getValidationMessages() {
 	return {
 		'name.required': 'The contact\'s name is required.',
 		'number.required': 'The contact\'s phone number is required.',
-		'id.required': 'Missing ID: Please select a contact to modify.',
+		'id.required': 'Missing ID. Please select a contact to modify.',
 		'number.max': 'The phone number entered is too long.',
 		'id.exists': 'This contact does not or no longer exists in our database.',
 	}
