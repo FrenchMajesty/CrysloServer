@@ -8,6 +8,7 @@ class ReferralSchema extends Schema {
 			table.increments()
 			table.integer('user_id').notNullable()
 			table.integer('new_user_id').notNullable().unique()
+			table.timestamp('credit_applied_at')
 			table.timestamps()
 		})
 	}

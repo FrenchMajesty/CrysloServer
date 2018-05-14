@@ -1,8 +1,41 @@
 'use strict'
 
+const Database = use('Database')
 const Model = use('Model')
 
 class Referral extends Model {
+
+	static boot() {
+		super.boot()
+	}
+
+	/**
+	 * Filter the query to only fetch referral entries that haven't been credited yet
+	 * @param  {Database} query Query builder
+	 * @return {Database}       
+	 */
+	scopeUnused(query) {
+		return query.whereNull('credit_applied_at')
+	}
+
+	/**
+	 * Filter the query to only fetch referral entries that have been credited
+	 * @param  {Database} query Query builder
+	 * @return {Database}       
+	 */
+	scopeCredited(query) {
+		return query.whereNotNull('credit_applied_at')
+	}
+
+	/**
+	 * Mark the current referral action as `used and applied` to the referring user's billing 
+	 * cycle 
+	 * @return {Void} 
+	 */
+	credited() {
+		this.credit_applied_at = Database.fn.now()
+		this.save()
+	}
 
 	/**
 	 * Get the user model that referred another user
