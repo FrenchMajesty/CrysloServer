@@ -14,7 +14,7 @@ class Referral extends Model {
 	 * @param  {Database} query Query builder
 	 * @return {Database}       
 	 */
-	scopeUnused(query) {
+	static scopeUnused(query) {
 		return query.whereNull('credit_applied_at')
 	}
 
@@ -23,7 +23,7 @@ class Referral extends Model {
 	 * @param  {Database} query Query builder
 	 * @return {Database}       
 	 */
-	scopeCredited(query) {
+	static scopeCredited(query) {
 		return query.whereNotNull('credit_applied_at')
 	}
 
