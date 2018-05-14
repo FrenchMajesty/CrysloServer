@@ -95,6 +95,14 @@ class User extends Model {
 	}
 
 	/**
+	 * Get all the breath measurements for this user
+	 * @return {Array} 
+	 */
+	breathData() {
+		return this.hasMany('App/Models/Reading/BreathUserData')
+	}
+
+	/**
 	 * A relationship on tokens is required for auth to
 	 * work. Since features like `refreshTokens` or
 	 * `rememberToken` will be saved inside the
