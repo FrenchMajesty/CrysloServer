@@ -7,7 +7,7 @@ class BreathUserDataSchema extends Schema {
 		this.create('breath_user_data', (table) => {
 			table.increments()
 			table.integer('user_id').notNullable()
-			table.string('value').notNullable()
+			table.integer('value').notNullable()
 			table.timestamps(true, true)
 		})
 	}

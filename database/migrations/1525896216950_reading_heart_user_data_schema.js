@@ -7,7 +7,7 @@ class HeartUserDataSchema extends Schema {
 		this.create('heart_user_data', (table) => {
 			table.increments()
 			table.integer('user_id').notNullable()
-			table.string('value').notNullable()
+			table.integer('value').notNullable()
 			table.timestamps(true, true)
 		})
 	}
