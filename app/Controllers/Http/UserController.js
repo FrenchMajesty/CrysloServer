@@ -2,6 +2,7 @@
 
 const AuthActivity = use('App/Models/AuthActivity')
 const Guardian = use('App/Models/Guardian')
+const BreathUserData = use('App/Models/Reading/BreathUserData')
 const User = use('App/Models/User')
 const { validate } = use('Validator')
 
@@ -43,6 +44,10 @@ class UserController {
 
 		if(request.input('withHeartData',false)) {
 			query.with('heartData')
+		}
+
+		if(request.input('withBreathData',false)) {
+			query.with('breathData')
 		}
 
 		return query.first()
