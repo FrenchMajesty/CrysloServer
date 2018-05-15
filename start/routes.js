@@ -43,6 +43,8 @@ Route.group(() => {
 
 	Route.get('/readingData', 'ReadingController.dataForThisMonth').as('reading.data')
 
+	Route.get('/ref/apply/user', 'ReferralController.applyAsUser').as('ref.apply.user')
+
 }).middleware(['auth']).formats(['json'])
 
 Route.resource('ref', 'ReferralController')

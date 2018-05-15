@@ -11,10 +11,11 @@ class ReferralController {
 	/**
 	 * Handle a request to apply a referral code for a new user signing up
 	 * @param  {Object} options.request The request HTTP object
+	 * @param  {Object} options.response The response HTTP object
 	 * @param  {Object} options.auth    The Auth module
 	 * @return {Void}                 
 	 */
-	async store ({request, auth}) {
+	async store ({request, response, auth}) {
 		const validator = await validate(request.all(), {
 			referral_id: 'required|exists:users',
 		}, getValidationMessages())
@@ -38,6 +39,27 @@ class ReferralController {
 	}
 
 	async destroy () {
+
+	}
+
+	/**
+	 * Use referral bonuses of a user's to apply them to the current billing cycle
+	 * @param {Object} options.response The HTTP response object
+	 * @param {Object} options.auth The Auth module
+	 * @return {Void} 
+	 */
+	async applyAsUser ({response, auth}) {
+		const {id: user_id} = await auth.getUser()
+		const {rows} = await Referral.query().where({user_id}).unused().fetch()
+
+		if(rows.length == 0) {
+			return response.status(401).json({message: 'You do not have any referrals bonus available to be applied.'})
+		}
+
+		// Call BrainTree method here to apply a credit to that user's account
+		// then discard the referrals used
+		//rows.forEach(referral => referral.credited())
+		return response.send(`A credit for ${rows.length} new users has been applied to your current billing cycle!`)
 	}
 }
 
