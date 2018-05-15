@@ -41,7 +41,9 @@ Route.group(() => {
 
 	Route.get('/user', 'UserController.user').as('user')
 
-	Route.get('/readingData', 'ReadingController.dataForThisMonth').as('reading.data')
+	Route.get('/readingData', 'ReadingController.thisMonth').as('reading.data')
+
+	Route.post('/readingData', 'ReadingController.selectedMonth').as('select.reading.data')
 
 	Route.get('/ref/apply/user', 'ReferralController.applyAsUser').as('ref.apply.user')
 

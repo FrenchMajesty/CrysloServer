@@ -2,14 +2,24 @@
 
 const BreathData = use('App/Models/Reading/BreathUserData')
 const HeartData = use('App/Models/Reading/HeartUserData')
+const { validate } = use('Validator')
 const moment = require('moment')
 
 class ReadingController {
 
-	async dataForThisMonth ({auth}) {
+	/**
+	 * Get all of the reading measurements data for this month of the logged in user
+	 * @param  {Object} options.auth The Auth module
+	 * @return {Object}              
+	 */
+	async thisMonth ({auth}) {
 		const {id: user_id} = await auth.getUser()
-
-		const thisMonth = [moment().startOf('month').format(), moment().endOf('month').format()]
+		const thisMonth = [
+			moment().startOf('month').format(),
+			moment().endOf('month').format()
+		]
+			
+		// Fetch data
 		const breathData = await BreathData.query()
 			.select('value','created_at')
 			.whereBetween('created_at', thisMonth)
@@ -22,13 +32,67 @@ class ReadingController {
 			.where({user_id})
 			.fetch()
 
-		const organized = {}
-		const averages = {}
+		const data = [
+			{data: breathData.rows, type: 'breath' },
+			{data: heartData.rows, type: 'heart' },
+		]
+
+		return this.formatData(data)
+	}
+
+	/**
+	 * Get all of the reading measurements data of the logged in user for the selected month
+	 * @param  {Object} options.auth The Auth module
+	 * @return {Object}              
+	 */
+	async selectedMonth ({request, response, auth}) {
+		const validation = await validate(request.all(), {
+			date: 'required|date',
+		}, getValidationMessages())
+
+		if(validation.fails()) {
+			return response.status(422).json(validation.messages())
+		}
+
+		const date = moment(request.input('date'), 'YYYY-MM-DD')
+		const {id: user_id} = await auth.getUser()
+		const thisMonth = [
+			date.startOf('month').format(),
+			date.endOf('month').format()
+		]
+
+		// Fetch data
+		const breathData = await BreathData.query()
+			.select('value','created_at')
+			.whereBetween('created_at', thisMonth)
+			.where({user_id})
+			.fetch()
+
+		const heartData = await HeartData.query()
+			.select('value','created_at')
+			.whereBetween('created_at', thisMonth)
+			.where({user_id})
+			.fetch()
 
 		const data = [
 			{data: breathData.rows, type: 'breath' },
 			{data: heartData.rows, type: 'heart' },
 		]
+
+		return this.formatData(data, date)
+	}
+
+	/**
+	 * Handles the organizating and formatting of the user measurement data to match the
+	 * front-end calendar format
+	 * @param  {Array} data    The list of data rows and type to organize
+	 * @param  {Moment} dateArg A Moment.js date instance
+	 * @return {Object}         
+	 */
+	formatData(data, dateArg) {
+		const momentDate = typeof dateArg !== 'undefined' ? dateArg : moment()
+		const organized = {}
+		const averages = {}
 
 		// Organize the datas per day
 		for(const loop of data) {
@@ -81,12 +145,19 @@ class ReadingController {
 
 		// Populate empty dates
 		const emptyDates = {}
-		const days = moment().daysInMonth()
+		const days = momentDate.daysInMonth()
 		for(let i = 1; i <= days; i++) {
-			emptyDates[moment().date(i).format('YYYY-MM-DD')] = []
+			emptyDates[momentDate.date(i).format('YYYY-MM-DD')] = []
 		}
 
 		return Object.assign(emptyDates, result)
+	}
+}
+
+function getValidationMessages() {
+	return {
+		'required': 'The {{ field }} is required.',
+		'date': 'The date is not valid.',
 	}
 }
 
