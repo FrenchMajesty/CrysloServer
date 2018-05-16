@@ -11,12 +11,20 @@ class AuthController {
 	/**
 	 * Handle a request to login by a user
 	 * @param  {Object} options.request The HTTP request object
+	 * @param  {Object} options.response The HTTP response object
 	 * @param  {Object} options.auth    The Auth module
 	 * @return {Token}                 
 	 */
-	async login({request, auth}) {
-		const { email, password } = request.all()
+	async login({request, response, auth}) {
+		const validator = await validate(request.all(), {
+			email: 'required|email',
+			password: 'required',
+		}, getValidationMessages())
 
+		if(validator.fails()) {
+			return response.status(422).json(validator.messages())
+		}
+		const {email, password} = request.all()
 		const user = await User.query().select('id').where({email}).first()
 		let attempt = null
 
@@ -167,11 +175,11 @@ class AuthController {
 
 function getValidationMessages() {
 	return {
-		'email.required': 'The email is required.',
+		'required': 'The {{ field }} is required.',
+		'unique': 'This {{ field }} is already used.',
 		'number.required': 'The phone number is required.',
 		'number.unique': 'This phone number is already used.',
 		'number.exists': 'No account with this phone number was found.',
-		'email.unique': 'This email is already used.',
 		'email.email': 'The email is not valid.',
 		'code.required': 'The verification code is required.',
 		'password.min': 'The password needs to be at least 6 characters.',
