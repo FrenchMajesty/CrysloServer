@@ -11,12 +11,19 @@
 |
 */
 
-// const Factory = use('Factory')
+const Factory = use('Factory')
+const Hash = use('Hash')
 
-/**
-  Factory.blueprint('App/Models/User', (faker) => {
-    return {
-      username: faker.username()
-    }
-  })
-*/
+const pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+Factory.blueprint('App/Models/User', async (faker) => {
+	return {
+	 	firstname: faker.first(),
+	 	lastname: faker.last(),
+	 	email: faker.email(),
+	 	number: faker.phone(),
+	 	referral_id : faker.string({pool, length: 6}),
+	 	password : await Hash.make('secret'),
+	}
+})
+
