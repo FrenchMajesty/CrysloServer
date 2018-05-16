@@ -12,7 +12,6 @@
 */
 
 const Factory = use('Factory')
-const Hash = use('Hash')
 
 const pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
@@ -23,7 +22,7 @@ Factory.blueprint('App/Models/User', async (faker) => {
 	 	email: faker.email(),
 	 	number: faker.phone(),
 	 	referral_id : faker.string({pool, length: 6}),
-	 	password : await Hash.make('secret'),
+	 	password : 'secret',
 	}
 })
 
