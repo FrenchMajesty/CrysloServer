@@ -1,6 +1,7 @@
 'use strict'
 
 const { test, trait, before } = use('Test/Suite')('Auth Register')
+const AuthActivity = use('App/Models/AuthActivity')
 const Guardian = use('App/Models/Guardian')
 const Factory = use('Factory')
 
@@ -19,12 +20,19 @@ test('make sure that a user can sign up', async ({ client, assert }) => {
 		.accept('json')
 		.end()
 
-	// Then a user account should be created with default Guardian settings
+	// Then a user account should be created and returned
 	response.assertStatus(200)
 	response.assertJSONSubset({email, number})
 
+	// A default Guardian settings entry should be created
 	const settings = await Guardian.query().where({user_id: response.body.id}).first()
 	assert.isOk(settings, 'No guardians settings entry was found for this newly registered user')
+
+	// And the authentication activiy should be recorded
+	const auth = await AuthActivity.query()
+		.where({user_id: response.body.id, action: 'SIGNUP'})
+		.first()
+	assert.isOk(auth, 'No auth activity entry was recorded for this newly registered user')
 })
 
 test('make sure that a user cannot sign up without an email', async ({ client, assert }) => {
