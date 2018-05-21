@@ -79,6 +79,14 @@ class User extends Model {
 	}
 
 	/**
+	 * Get the Onboarding action record of this user
+	 * @return {Onboarding} 
+	 */
+	onboarding() {
+		return this.hasOne('App/Models/Onboarding')
+	}
+
+	/**
 	 * Get the auth activity of this user
 	 * @return {Array} 
 	 */
