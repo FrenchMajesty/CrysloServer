@@ -47,6 +47,8 @@ Route.group(() => {
 
 	Route.get('/ref/apply/user', 'ReferralController.applyAsUser').as('ref.apply.user')
 
+	Route.post('/onboarding', 'OnboardingController.report').as('onboarding.report')
+
 }).middleware(['auth']).formats(['json'])
 
 Route.resource('ref', 'ReferralController')
