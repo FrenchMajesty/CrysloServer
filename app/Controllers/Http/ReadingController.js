@@ -150,7 +150,17 @@ class ReadingController {
 			emptyDates[momentDate.date(i).format('YYYY-MM-DD')] = []
 		}
 
-		return Object.assign(emptyDates, result)
+		const final = Object.assign(emptyDates, result)
+		const results = {};
+
+		for(const date in final) {
+			// Filter out dates that are in the future
+			if(moment(date).unix() < moment().unix()) {
+				results[date] = final[date];
+			}
+		}
+
+		return results;
 	}
 }
 
