@@ -28,16 +28,6 @@ class User extends Model {
 		return super.dates.concat(['deleted_at'])
 	}
 
-	 /**
-	 * Format the date to be returned by the API
-	 * @param  {String} field Name of the field
-	 * @param  {Object} value moment.js instance of the date
-	 * @return {String}       
-	 */
-	static castDates(field, value) {
-		return `${value.fromNow(true)} ago`
-	}
-
 	/**
 	 * Get the rank associated with this user
 	 * @return {Rank} 
