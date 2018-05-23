@@ -5,6 +5,8 @@ const AuthActivity = use ('App/Models/AuthActivity')
 const User = use ('App/Models/User')
 const Hash = use('Hash')
 const { validate } = use('Validator')
+const Env = use('Env')
+const axios = require('axios')
 
 class AuthController {
 
@@ -59,7 +61,7 @@ class AuthController {
 	}
 
 	/**
-	 * Handle a request to verify whether a phone number is not in use for creating 
+	 * Handle a request to generate a verification code for a phone number for creating 
 	 * a new account
 	 * @param  {Object} options.request  The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
@@ -74,21 +76,29 @@ class AuthController {
 			return response.status(422).json(validator.messages())
 		}
 
-		// Create a verificaton code
-		const code = new VerificationCode()
-		code.fill({
-			number: request.input('number'),
-			purpose: 'signup',
-		})
-		code.generateCode()
-		code.save()
+		try {
+			const {number} = request.all()
+			const res = await this.sendVerifCode(number)
 
-		return response.status(200).json(true)
+			// Create an entry
+			const code = new VerificationCode()
+			code.fill({
+				number, 
+				purpose: 'signup',
+				code: 0
+			})
+			code.save()
+
+			return response.status(200).json(res.data)
+			
+		}catch({response: {data}}) {
+			return response.status(422).json(data)
+		}
 	}
 
 	/**
-	 * Handle a request to verify whether an account with the given phone number 
-	 * exists for resetting a forgotten password 
+	 * Handle a request to generate a verification code for a phone number for resetting
+	 * a forgotten password 
 	 * @param  {Object} options.request  The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
 	 * @return {Object}                  
@@ -102,19 +112,28 @@ class AuthController {
 			return response.status(422).json(validator.messages())
 		}
 
-		// Create a verificaton code
-		const {number} = request.all()
-		const code = new VerificationCode()
-		code.fill({number, purpose: 'forgotpwd'})
-		code.generateCode()
-		code.save()
+		try {
+			const {number} = request.all()
+			const res = await this.sendVerifCode(number)
 
-		const {id} = await User.query().where({number}).first()
-		return response.status(200).json({id})
+			// Create an entry
+			const code = new VerificationCode()
+			code.fill({
+				number, 
+				purpose: 'forgotpwd',
+				code: 0
+			})
+			code.save()
+
+			return response.status(200).json(res.data)
+			
+		}catch({response: {data}}) {
+			return response.status(422).json(data)
+		}
 	}
 
 	/**
-	 * Handle a request to check if a valid verification code was submitted
+	 * Handle a request to verify the validity of a verification code sent
 	 * @param  {Object} options.request  The HTTP request object
 	 * @param  {Object} options.response The HTTP response object
 	 * @return {Object}                  
@@ -129,21 +148,29 @@ class AuthController {
 			return response.status(422).json(validator.messages())
 		}
 
-		// Fetch latest matching verification code
-		const {code, number} = request.all()
+		try {
+			const {number, code} = request.all()
+
+			// Submit the request to Twilio
+			const params = `?country_code=1&phone_number=${number}&verification_code=${code}`
+			const res = await axios.get(`${Env.get('TWILIO_VERIFY_URL')}/check${params}`, {
+				headers: { 
+					'X-Authy-API-Key': Env.get('TWILIO_VERIFY_API_KEY') 
+				}
+			})
+		
 		const codeEntry = await VerificationCode.query()
-			.where({code, number})
+			.where({number})
 			.notDeleted()
   			.orderBy('id', 'desc')
   			.first()
 
-  		if(!codeEntry) {
-			return response.status(422)
-					.json([{message: 'The verification code provided is invalid.'}])
-  		}
-
   		codeEntry.discard()
-  		return response.status(200).json(true)
+
+			return response.status(200).json(res.data)
+		}catch({response: {data}}) {
+			return response.status(422).json(data)
+		}		
 	}
 
 
@@ -171,19 +198,40 @@ class AuthController {
 		// Record this action
 		AuthActivity.create({user_id: user.id, action: 'RESET_PASSWORD'})
 	}
+
+	/**
+	 * Submit a request to send a verification code to the SMS dispatcher
+	 * @param  {String} phone_number The phone number to text
+	 * @return {Promise}              
+	 */
+	async sendVerifCode(phone_number) {
+		const data = {
+			phone_number,
+			via: 'sms',
+			country_code: 1,
+			code_length: 5,
+			locale: 'en',
+		}
+
+		return axios.post(`${Env.get('TWILIO_VERIFY_URL')}/start`, data, {
+			headers: { 
+				'X-Authy-API-Key': Env.get('TWILIO_VERIFY_API_KEY') 
+			}
+		})	
+	}
 }
 
 function getValidationMessages() {
 	return {
 		'required': 'The {{ field }} is required.',
 		'unique': 'This {{ field }} is already used.',
+		'confirmed': 'The {{ field }} do not match.',
+		'min': 'The {{ field }} needs to be at least 6 characters.',
 		'number.required': 'The phone number is required.',
 		'number.unique': 'This phone number is already used.',
 		'number.exists': 'No account with this phone number was found.',
-		'email.email': 'The email is not valid.',
 		'code.required': 'The verification code is required.',
-		'password.min': 'The password needs to be at least 6 characters.',
-		'password.confirmed': 'The passwords do not match.',
+		'email.email': 'The email is not valid.',
 	}
 }
 
