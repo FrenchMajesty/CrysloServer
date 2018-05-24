@@ -45,6 +45,8 @@ Route.group(() => {
 
 	Route.post('/readingData', 'ReadingController.selectedMonth').as('select.reading.data')
 
+	Route.post('/readingData/store', 'ReadingController.store').as('reading.data.store')
+
 	Route.get('/ref/apply/user', 'ReferralController.applyAsUser').as('ref.apply.user')
 
 	Route.post('/onboarding', 'OnboardingController.report').as('onboarding.report')

@@ -8,6 +8,40 @@ const moment = require('moment')
 class ReadingController {
 
 	/**
+	 * Handle a request to store the reading's measurement value
+	 * @param  {Object} options.request  The HTTP request object
+	 * @param  {Object} options.response  The HTTP response object
+	 * @param  {Object} options.auth     The Auth module
+	 * @return {BreathData|HeartData}                  
+	 */
+	async store ({request, response, auth}) {
+		const value = Number(request.input('value'))
+		const validation = await validate({...request.all(), value}, {
+			type: 'required|in:breath,heart',
+			value: 'required|integer'
+		}, getValidationMessages())
+
+		if(validation.fails()) {
+			return response.status(422).json(validation.messages())
+		}
+
+		const {type} = request.all()
+		const {id: user_id} = await auth.getUser()
+
+		switch(type) {
+
+			case 'breath':
+				return BreathData.create({user_id, value})
+
+			case 'heart':
+				return HeartData.create({user_id, value})
+
+			default:
+				return
+		}
+	}
+
+	/**
 	 * Get all of the reading measurements data for this month of the logged in user
 	 * @param  {Object} options.auth The Auth module
 	 * @return {Object}              
@@ -167,6 +201,8 @@ class ReadingController {
 function getValidationMessages() {
 	return {
 		'required': 'The {{ field }} is required.',
+		'in': 'The {{ field }} is not one of the allowed values.',
+		'integer': 'The {{ field }} is not a valid integer.',
 		'date': 'The date is not valid.',
 	}
 }
